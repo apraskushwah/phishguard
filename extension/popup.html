@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 380px;
+      min-height: 200px;
+      background: #020408;
+      color: #e2e8f0;
+      font-family: 'Share Tech Mono', monospace;
+      overflow: hidden;
+    }
+
+    .scanlines {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+      pointer-events: none; z-index: 999;
+      animation: scanMove 8s linear infinite;
+    }
+    @keyframes scanMove { from{background-position:0 0} to{background-position:0 100%} }
+
+    .grid-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-image:
+        linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
+      background-size: 30px 30px; pointer-events: none; z-index: 0;
+    }
+
+    .corner-tl, .corner-tr, .corner-bl, .corner-br {
+      position: fixed; width: 20px; height: 20px; z-index: 2; pointer-events: none;
+    }
+    .corner-tl { top: 8px; left: 8px; border-top: 1px solid rgba(0,255,136,0.5); border-left: 1px solid rgba(0,255,136,0.5); }
+    .corner-tr { top: 8px; right: 8px; border-top: 1px solid rgba(0,255,136,0.5); border-right: 1px solid rgba(0,255,136,0.5); }
+    .corner-bl { bottom: 8px; left: 8px; border-bottom: 1px solid rgba(0,255,136,0.5); border-left: 1px solid rgba(0,255,136,0.5); }
+    .corner-br { bottom: 8px; right: 8px; border-bottom: 1px solid rgba(0,255,136,0.5); border-right: 1px solid rgba(0,255,136,0.5); }
+
+    .content { position: relative; z-index: 1; padding: 14px 16px; }
+
+    .header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,255,136,0.1);
+    }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px; font-weight: 900;
+      color: #00ff88; letter-spacing: 4px;
+      text-shadow: 0 0 15px rgba(0,255,136,0.5);
+    }
+
+    .status-badge {
+      display: flex; align-items: center; gap: 5px;
+      border: 1px solid rgba(0,255,136,0.2);
+      padding: 3px 8px;
+      background: rgba(0,255,136,0.03);
+    }
+
+    .status-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #00ff88;
+      box-shadow: 0 0 6px #00ff88;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+
+    .current-url {
+      background: rgba(0,255,136,0.02);
+      border: 1px solid rgba(0,255,136,0.1);
+      padding: 8px 10px; margin-bottom: 10px;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    }
+
+    .url-label { font-size: 8px; color: rgba(0,255,136,0.3); letter-spacing: 3px; margin-bottom: 4px; }
+    .url-text { font-size: 10px; color: rgba(0,255,136,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .scan-btn {
+      width: 100%; height: 42px;
+      background: transparent;
+      border: 1px solid #00ff88;
+      color: #00ff88;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 3px; cursor: pointer;
+      transition: all .2s; margin-bottom: 10px;
+      position: relative; overflow: hidden;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    }
+    .scan-btn::before {
+      content: ''; position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,255,136,0.15), transparent);
+      transition: left .4s;
+    }
+    .scan-btn:hover::before { left: 100%; }
+    .scan-btn:hover { background: rgba(0,255,136,0.08); box-shadow: 0 0 20px rgba(0,255,136,0.2); text-shadow: 0 0 10px #00ff88; }
+    .scan-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .loader { text-align: center; padding: 16px; display: none; }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 1px solid rgba(0,255,136,0.1);
+      border-top: 1px solid #00ff88;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 8px;
+    }
+    .loader-text { font-size: 9px; color: rgba(0,255,136,0.4); letter-spacing: 3px; animation: pulse 2s infinite; }
+
+    .result { display: none; animation: fadeIn .4s ease; }
+
+    .result-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px; margin-bottom: 8px;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+
+    .score-circle {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; border: 1px solid currentColor;
+      flex-direction: column; position: relative;
+    }
+    .score-num { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 900; line-height: 1; }
+    .score-lbl { font-size: 6px; letter-spacing: 1px; opacity: .6; margin-top: 2px; }
+
+    .verdict-text { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 900; letter-spacing: 2px; }
+    .verdict-sub { font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 4px; }
+
+    .flags { margin-top: 6px; }
+    .flag-item {
+      display: flex; align-items: flex-start; gap: 7px;
+      padding: 6px 0; border-bottom: 1px solid rgba(0,255,136,0.06);
+      font-size: 10px; animation: slideIn .3s ease;
+    }
+    .flag-item:last-child { border-bottom: none; }
+
+    .flag-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+    .flag-label { color: #e2e8f0; font-weight: 600; }
+    .flag-detail { color: rgba(255,255,255,0.3); font-size: 9px; }
+    .flag-badge {
+      margin-left: auto; font-size: 8px;
+      padding: 2px 6px; letter-spacing: 1px; flex-shrink: 0;
+    }
+
+    .open-btn {
+      width: 100%; height: 32px;
+      background: transparent;
+      border: 1px solid rgba(0,255,136,0.15);
+      color: rgba(0,255,136,0.4);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; letter-spacing: 2px;
+      cursor: pointer; margin-top: 10px;
+      transition: all .2s;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    }
+    .open-btn:hover { border-color: rgba(0,255,136,0.4); color: rgba(0,255,136,0.7); background: rgba(0,255,136,0.03); }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="grid-bg"></div>
+  <div class="corner-tl"></div><div class="corner-tr"></div>
+  <div class="corner-bl"></div><div class="corner-br"></div>
+
+  <div class="content">
+    <div class="header">
+      <div class="logo">PHISHGUARD</div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span style="font-size:8px;color:rgba(0,255,136,0.5);letter-spacing:2px;">ONLINE</span>
+      </div>
+    </div>
+
+    <div class="current-url">
+      <div class="url-label">CURRENT TARGET</div>
+      <div class="url-text" id="currentUrl">Detecting...</div>
+    </div>
+
+    <button class="scan-btn" id="scanBtn">▸ SCAN THIS PAGE</button>
+
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <div class="loader-text">ANALYZING THREAT VECTORS...</div>
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <button class="open-btn" id="openApp">▸ OPEN FULL PHISHGUARD APP ↗</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

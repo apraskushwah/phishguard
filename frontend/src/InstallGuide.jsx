@@ -178,8 +178,8 @@ export default function InstallGuide() {
               </div>
             </div>
             <button
-              className="download-btn"
-              onClick={() => alert("Zip file download hogi jab GitHub pe upload karoge!\n\nAbhi ke liye manually extension folder share karo judges ke saath.")}
+             className="download-btn"
+              onClick={() => window.open("https://github.com/apraskushwah/phishguard-extension/releases/tag/v2.0", "_blank")}
             >
               ⬇ Download PhishGuard Extension (.zip)
             </button>

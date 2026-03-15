@@ -152,11 +152,14 @@ Give a response in exactly this format:
 
 Keep it simple — imagine explaining to someone non-technical.`;
 
-    const models = [
-      "google/gemma-3-4b-it:free",
-      "meta-llama/llama-3.2-3b-instruct:free",
-      "mistralai/mistral-7b-instruct:free",
-    ];
+   const models = [
+  "stepfun-ai/step-3.5-flash:free",
+  "meta-llama/llama-3.3-70b-instruct:free",
+  "google/gemma-3-4b-it:free",
+  "meta-llama/llama-3.2-3b-instruct:free",
+  "mistralai/mistral-7b-instruct:free",
+  "qwen/qwen-2-7b-instruct:free",
+];
 
     let explanation = null;
 
@@ -216,7 +219,7 @@ app.post("/api/analyze-email", async (req, res) => {
     const urlResults = [];
     for (const url of urls.slice(0, 5)) {
       try {
-        const r = await axios.post("http://localhost:5000/api/check-url", { url });
+        const r = await axios.post("http://https://phishguard-backend-6cq9.onrender.com/api/check-url", { url });
         urlResults.push({ url, ...r.data });
       } catch {
         urlResults.push({ url, verdict: "Error", score: 0, color: "warn" });

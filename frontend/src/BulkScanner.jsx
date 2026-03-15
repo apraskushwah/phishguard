@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 async function realAnalysis(url) {
-  const res = await fetch("http://localhost:5000/api/check-url", {
+  const res = await fetch("https://phishguard-backend-6cq9.onrender.com/api/check-url", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url }),

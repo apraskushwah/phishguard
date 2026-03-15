@@ -20,7 +20,7 @@ export default function EmailAnalyzer() {
     if (!emailContent.trim()) { setError("Please paste email content first"); return; }
     setError(""); setLoading(true); setResult(null);
     try {
-      const res = await fetch("http://localhost:5000/api/analyze-email", {
+      const res = await fetch("https://phishguard-backend-6cq9.onrender.com/api/check-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ emailContent }),

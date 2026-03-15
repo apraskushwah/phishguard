@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import jsQR from "jsqr";
 
 async function realAnalysis(url) {
-  const res = await fetch("http://localhost:5000/api/check-url", {
+  const res = await fetch("https://phishguard-backend-6cq9.onrender.com/api/check-url", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url }),
@@ -12,7 +12,7 @@ async function realAnalysis(url) {
 }
 
 async function getAIExplanation(url, verdict, score, flags) {
-  const res = await fetch("http://localhost:5000/api/ai-explain", {
+  const res = await fetch("https://phishguard-backend-6cq9.onrender.com/api/ai-explain", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url, verdict, score, flags }),

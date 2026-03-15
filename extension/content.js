@@ -94,7 +94,7 @@ function setBadgeResult(link, color) {
 async function checkURL(url) {
   if (cache[url]) return cache[url];
   try {
-    const res = await fetch("http://https://phishguard-backend-6cq9.onrender.com/api/check-url", {
+    const res = await fetch("https://phishguard-backend-6cq9.onrender.com/api/check-url", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url }),

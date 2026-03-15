@@ -12,7 +12,7 @@ const severityColor = {
 };
 
 async function analyzeURL(url) {
-  const res = await fetch("http://https://phishguard-backend-6cq9.onrender.com/api/check-url", {
+  const res = await fetch("https://phishguard-backend-6cq9.onrender.com/api/check-url", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url }),
@@ -62,7 +62,6 @@ function showResult(data) {
   resultEl.style.display = "block";
 }
 
-// Get current tab URL
 document.addEventListener("DOMContentLoaded", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const url = tab?.url || "";
@@ -70,7 +69,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlEl = document.getElementById("currentUrl");
   urlEl.textContent = url || "Unknown";
 
-  // Scan button
   document.getElementById("scanBtn").addEventListener("click", async () => {
     if (!url) return;
     showLoader(true);
@@ -81,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (err) {
       showResult({
         score: 0, verdict: "Error", color: "warn",
-        flags: [{ label: "Connection Error", detail: "Make sure backend is running!", severity: "high" }],
+        flags: [{ label: "Connection Error", detail: "Backend unreachable!", severity: "high" }],
         domain: "", hasHTTPS: false, domainAge: 0,
       });
     } finally {
@@ -89,8 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Open full app
   document.getElementById("openApp").addEventListener("click", () => {
-    chrome.tabs.create({ url: "http://localhost:5173" });
+    chrome.tabs.create({ url: "https://phishguard-wine.vercel.app/" });
   });
 });

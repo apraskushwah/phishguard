@@ -9,7 +9,7 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "phishguard-scan") {
     chrome.tabs.create({
-      url: `http://localhost:5173?url=${encodeURIComponent(info.linkUrl)}`,
+      url: `https://phishguard-wine.vercel.app/?url=${encodeURIComponent(info.linkUrl)}`,
     });
   }
 });

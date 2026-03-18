@@ -156,12 +156,12 @@ Give a response in exactly this format:
 Keep it simple — imagine explaining to someone non-technical.`;
 
     const models = [
-      "stepfun-ai/step-3.5-flash:free",
-      "meta-llama/llama-3.3-70b-instruct:free",
-      "google/gemma-3-4b-it:free",
-      "meta-llama/llama-3.2-3b-instruct:free",
+      "google/gemma-2-9b-it:free",
+      "meta-llama/llama-3.1-8b-instruct:free",
       "mistralai/mistral-7b-instruct:free",
-      "qwen/qwen-2-7b-instruct:free",
+      "nousresearch/hermes-3-llama-3.1-405b:free",
+      "microsoft/phi-3-mini-128k-instruct:free",
+      "huggingfaceh4/zephyr-7b-beta:free",
     ];
 
     let explanation = null;

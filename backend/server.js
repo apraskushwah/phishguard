@@ -219,7 +219,7 @@ app.post("/api/analyze-email", async (req, res) => {
     const urlResults = [];
     for (const url of urls.slice(0, 5)) {
       try {
-        const r = await axios.post("http://https://phishguard-backend-6cq9.onrender.com/api/check-url", { url });
+        const r = await axios.post("http://localhost:5000/api/check-url", { url });
         urlResults.push({ url, ...r.data });
       } catch {
         urlResults.push({ url, verdict: "Error", score: 0, color: "warn" });

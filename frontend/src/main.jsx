@@ -6,7 +6,8 @@ import BulkScanner from "./BulkScanner.jsx";
 import "./index.css";
 import QRScanner from "./QRScanner.jsx";
 import EmailAnalyzer from "./EmailAnalyzer.jsx";
-import InstallGuide from "./InstallGuide.jsx"
+import InstallGuide from "./InstallGuide.jsx";
+import About from "./About.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/qr" element={<QRScanner />} />
         <Route path="/email" element={<EmailAnalyzer />} />
         <Route path="/install" element={<InstallGuide />} />
+        <Route path="/about" element={<About />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

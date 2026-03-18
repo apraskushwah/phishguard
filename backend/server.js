@@ -156,23 +156,18 @@ Give a response in exactly this format:
 Keep it simple — imagine explaining to someone non-technical.`;
 
     const response = await axios.post(
-      "https://api.anthropic.com/v1/messages",
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 400,
-        messages: [{ role: "user", content: prompt }],
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 400 },
       },
       {
-        headers: {
-          "x-api-key": process.env.ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         timeout: 30000,
       }
     );
 
-    const explanation = response.data.content[0].text;
+    const explanation = response.data.candidates[0].content.parts[0].text;
     res.json({ explanation });
 
   } catch (err) {

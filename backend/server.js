@@ -7,6 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Base URL for internal API calls
+const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
+
 app.get("/", (req, res) => {
   res.json({ message: "PhishGuard API running!" });
 });
@@ -152,14 +155,14 @@ Give a response in exactly this format:
 
 Keep it simple — imagine explaining to someone non-technical.`;
 
-   const models = [
-  "stepfun-ai/step-3.5-flash:free",
-  "meta-llama/llama-3.3-70b-instruct:free",
-  "google/gemma-3-4b-it:free",
-  "meta-llama/llama-3.2-3b-instruct:free",
-  "mistralai/mistral-7b-instruct:free",
-  "qwen/qwen-2-7b-instruct:free",
-];
+    const models = [
+      "stepfun-ai/step-3.5-flash:free",
+      "meta-llama/llama-3.3-70b-instruct:free",
+      "google/gemma-3-4b-it:free",
+      "meta-llama/llama-3.2-3b-instruct:free",
+      "mistralai/mistral-7b-instruct:free",
+      "qwen/qwen-2-7b-instruct:free",
+    ];
 
     let explanation = null;
 
@@ -176,7 +179,8 @@ Keep it simple — imagine explaining to someone non-technical.`;
             headers: {
               Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
               "Content-Type": "application/json",
-              "HTTP-Referer": "http://localhost:5173",
+              // ✅ FIXED: Vercel URL use karo localhost nahi
+              "HTTP-Referer": process.env.FRONTEND_URL || "https://phishguard.vercel.app",
               "X-Title": "PhishGuard",
             },
             timeout: 30000,
@@ -219,8 +223,9 @@ app.post("/api/analyze-email", async (req, res) => {
     const urlResults = [];
     for (const url of urls.slice(0, 5)) {
       try {
-        const r = await axios.post("http://localhost:5000/api/check-url", { url });
-        urlResults.push({ url, ...r.data });
+        // ✅ FIXED: localhost hataya, internal function call karo
+        const checkResult = await checkUrlInternal(url);
+        urlResults.push({ url, ...checkResult });
       } catch {
         urlResults.push({ url, verdict: "Error", score: 0, color: "warn" });
       }
@@ -251,6 +256,36 @@ app.post("/api/analyze-email", async (req, res) => {
     res.status(500).json({ error: "Analysis failed", detail: err.message });
   }
 });
+
+// ✅ NEW: Internal function — no HTTP call needed
+async function checkUrlInternal(url) {
+  const url_lower = url.toLowerCase();
+  const hasHTTPS = url.startsWith("https://");
+  let parsedDomain = "";
+  try { parsedDomain = new URL(url).hostname; } catch {}
+
+  const hasIP = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(url);
+  const hasSuspicious = ["login", "verify", "secure", "account", "update", "banking", "paypal", "amazon", "confirm"].some(k => url_lower.includes(k));
+  const hasLongSub = (url.match(/\./g) || []).length > 3;
+  const hasDash = parsedDomain.includes("-");
+  const hasSpecialChars = /[@%]/.test(url);
+
+  let score = 100;
+  const flags = [];
+
+  if (!hasHTTPS) { score -= 30; flags.push({ label: "No HTTPS", detail: "Not encrypted", severity: "high" }); }
+  if (hasIP) { score -= 35; flags.push({ label: "IP address used", detail: "Raw IP detected", severity: "high" }); }
+  if (hasLongSub) { score -= 20; flags.push({ label: "Excessive subdomains", detail: "Suspicious structure", severity: "medium" }); }
+  if (hasSuspicious) { score -= 25; flags.push({ label: "Suspicious keyword", detail: "Common in phishing", severity: "medium" }); }
+  if (hasDash) { score -= 10; flags.push({ label: "Dashes in domain", detail: "May spoof legit sites", severity: "low" }); }
+  if (hasSpecialChars) { score -= 20; flags.push({ label: "Special characters", detail: "Unusual chars in URL", severity: "high" }); }
+
+  score = Math.max(0, Math.min(100, score));
+  const verdict = score >= 70 ? "Safe" : score >= 40 ? "Suspicious" : "Dangerous";
+  const color = score >= 70 ? "safe" : score >= 40 ? "warn" : "danger";
+
+  return { score, verdict, color, flags, domain: parsedDomain, hasHTTPS, domainAge: 0 };
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ PhishGuard API running on port ${PORT}`));

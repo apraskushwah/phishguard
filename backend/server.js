@@ -155,53 +155,28 @@ Give a response in exactly this format:
 
 Keep it simple — imagine explaining to someone non-technical.`;
 
-    const models = [
-      "google/gemma-2-9b-it:free",
-      "meta-llama/llama-3.1-8b-instruct:free",
-      "mistralai/mistral-7b-instruct:free",
-      "nousresearch/hermes-3-llama-3.1-405b:free",
-      "microsoft/phi-3-mini-128k-instruct:free",
-      "huggingfaceh4/zephyr-7b-beta:free",
-    ];
-
-    let explanation = null;
-
-    for (const model of models) {
-      try {
-        const response = await axios.post(
-          "https://openrouter.ai/api/v1/chat/completions",
-          {
-            model: model,
-            messages: [{ role: "user", content: prompt }],
-            max_tokens: 300,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-              "Content-Type": "application/json",
-              // ✅ FIXED: Vercel URL use karo localhost nahi
-              "HTTP-Referer": process.env.FRONTEND_URL || "https://phishguard.vercel.app",
-              "X-Title": "PhishGuard",
-            },
-            timeout: 30000,
-          }
-        );
-        explanation = response.data.choices[0].message.content;
-        break;
-      } catch (modelErr) {
-        console.log(`Model ${model} failed — trying next...`);
-        continue;
+    const response = await axios.post(
+      "https://api.anthropic.com/v1/messages",
+      {
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 400,
+        messages: [{ role: "user", content: prompt }],
+      },
+      {
+        headers: {
+          "x-api-key": process.env.ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+          "Content-Type": "application/json",
+        },
+        timeout: 30000,
       }
-    }
+    );
 
-    if (!explanation) {
-      return res.status(500).json({ error: "All AI models failed — try again later!" });
-    }
-
+    const explanation = response.data.content[0].text;
     res.json({ explanation });
 
   } catch (err) {
-    console.error("AI error:", err.message);
+    console.error("AI error:", err.response?.data || err.message);
     res.status(500).json({ error: "AI explanation failed", detail: err.message });
   }
 });

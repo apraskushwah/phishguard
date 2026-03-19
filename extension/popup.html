@@ -3,202 +3,224 @@
 <head>
   <meta charset="UTF-8" />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       width: 380px;
-      min-height: 200px;
-      background: #020408;
+      min-height: 220px;
+      background: #050a14;
       color: #e2e8f0;
-      font-family: 'Share Tech Mono', monospace;
+      font-family: 'DM Sans', sans-serif;
       overflow: hidden;
+      position: relative;
     }
 
-    .scanlines {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
-      pointer-events: none; z-index: 999;
-      animation: scanMove 8s linear infinite;
+    /* BG layers */
+    .bg-aurora {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 60% at 10% 0%, rgba(0,150,255,0.09) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 80% at 90% 100%, rgba(0,255,160,0.06) 0%, transparent 55%);
     }
-    @keyframes scanMove { from{background-position:0 0} to{background-position:0 100%} }
-
-    .grid-bg {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    .bg-grid {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
       background-image:
-        linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
-      background-size: 30px 30px; pointer-events: none; z-index: 0;
+        linear-gradient(rgba(0,200,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,200,255,0.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
     }
 
-    .corner-tl, .corner-tr, .corner-bl, .corner-br {
-      position: fixed; width: 20px; height: 20px; z-index: 2; pointer-events: none;
-    }
-    .corner-tl { top: 8px; left: 8px; border-top: 1px solid rgba(0,255,136,0.5); border-left: 1px solid rgba(0,255,136,0.5); }
-    .corner-tr { top: 8px; right: 8px; border-top: 1px solid rgba(0,255,136,0.5); border-right: 1px solid rgba(0,255,136,0.5); }
-    .corner-bl { bottom: 8px; left: 8px; border-bottom: 1px solid rgba(0,255,136,0.5); border-left: 1px solid rgba(0,255,136,0.5); }
-    .corner-br { bottom: 8px; right: 8px; border-bottom: 1px solid rgba(0,255,136,0.5); border-right: 1px solid rgba(0,255,136,0.5); }
+    .content { position: relative; z-index: 1; padding: 16px; }
 
-    .content { position: relative; z-index: 1; padding: 14px 16px; }
-
+    /* HEADER */
     .header {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(0,255,136,0.1);
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-
     .logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 16px; font-weight: 900;
-      color: #00ff88; letter-spacing: 4px;
-      text-shadow: 0 0 15px rgba(0,255,136,0.5);
+      font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800;
+      background: linear-gradient(135deg, #00c8ff, #00ffb4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; letter-spacing: -0.3px;
     }
-
     .status-badge {
-      display: flex; align-items: center; gap: 5px;
-      border: 1px solid rgba(0,255,136,0.2);
-      padding: 3px 8px;
-      background: rgba(0,255,136,0.03);
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,200,255,0.05); border: 1px solid rgba(0,200,255,0.12);
+      border-radius: 999px; padding: 4px 10px;
     }
-
     .status-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: #00ff88;
-      box-shadow: 0 0 6px #00ff88;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #00ffb4; box-shadow: 0 0 8px #00ffb4;
       animation: pulse 2s infinite;
     }
+    .status-text { font-size: 9px; color: rgba(0,200,255,0.6); letter-spacing: 2px; font-weight: 600; }
 
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
-
-    .current-url {
-      background: rgba(0,255,136,0.02);
-      border: 1px solid rgba(0,255,136,0.1);
-      padding: 8px 10px; margin-bottom: 10px;
-      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    /* URL BOX */
+    .url-box {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 10px 12px; margin-bottom: 12px;
+      position: relative; overflow: hidden;
+    }
+    .url-box::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,200,255,0.25), transparent);
+    }
+    .url-label { font-size: 9px; color: rgba(255,255,255,0.22); letter-spacing: 2.5px; font-weight: 600; margin-bottom: 5px; }
+    .url-text {
+      font-family: 'DM Mono', monospace; font-size: 10.5px;
+      color: rgba(0,200,255,0.65); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
     }
 
-    .url-label { font-size: 8px; color: rgba(0,255,136,0.3); letter-spacing: 3px; margin-bottom: 4px; }
-    .url-text { font-size: 10px; color: rgba(0,255,136,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
+    /* SCAN BUTTON */
     .scan-btn {
-      width: 100%; height: 42px;
-      background: transparent;
-      border: 1px solid #00ff88;
-      color: #00ff88;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 12px; font-weight: 700;
-      letter-spacing: 3px; cursor: pointer;
-      transition: all .2s; margin-bottom: 10px;
+      width: 100%; height: 44px;
+      background: linear-gradient(135deg, #00c8ff, #00ffb4);
+      color: #030d18; border: none; border-radius: 12px;
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+      margin-bottom: 12px; letter-spacing: 0.3px;
+      box-shadow: 0 4px 20px rgba(0,200,255,0.25);
       position: relative; overflow: hidden;
-      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
     }
     .scan-btn::before {
-      content: ''; position: absolute;
-      top: 0; left: -100%; width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(0,255,136,0.15), transparent);
-      transition: left .4s;
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+      opacity: 0; transition: opacity 0.3s;
     }
-    .scan-btn:hover::before { left: 100%; }
-    .scan-btn:hover { background: rgba(0,255,136,0.08); box-shadow: 0 0 20px rgba(0,255,136,0.2); text-shadow: 0 0 10px #00ff88; }
-    .scan-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .scan-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,200,255,0.4); }
+    .scan-btn:hover::before { opacity: 1; }
+    .scan-btn:active { transform: translateY(0); }
+    .scan-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    .loader { text-align: center; padding: 16px; display: none; }
+    /* LOADER */
+    .loader { text-align: center; padding: 20px; display: none; }
+    .spinner-wrap { position: relative; width: 44px; height: 44px; margin: 0 auto 12px; }
     .spinner {
-      width: 28px; height: 28px;
-      border: 1px solid rgba(0,255,136,0.1);
-      border-top: 1px solid #00ff88;
+      width: 44px; height: 44px;
+      border: 2px solid rgba(0,200,255,0.08);
+      border-top: 2px solid #00c8ff;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 8px;
     }
-    .loader-text { font-size: 9px; color: rgba(0,255,136,0.4); letter-spacing: 3px; animation: pulse 2s infinite; }
+    .spinner-dot {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px; height: 8px; background: #00ffb4;
+      border-radius: 50%; box-shadow: 0 0 10px #00ffb4;
+      animation: pulse 2s infinite;
+    }
+    .loader-text { font-size: 9px; color: rgba(0,200,255,0.5); letter-spacing: 2.5px; font-weight: 600; animation: pulse 2s infinite; }
 
-    .result { display: none; animation: fadeIn .4s ease; }
+    /* RESULT */
+    .result { display: none; animation: fadeIn 0.4s cubic-bezier(0.23,1,0.32,1); }
 
-    .result-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px; margin-bottom: 8px;
-      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    .result-card {
+      border-radius: 16px; padding: 14px; margin-bottom: 10px;
+      position: relative; overflow: hidden;
+    }
+    .result-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, currentColor, transparent);
+      opacity: 0.3;
+    }
+    .result-inner { display: flex; align-items: center; gap: 14px; }
+
+    /* SCORE RING */
+    .score-svg { flex-shrink: 0; filter: drop-shadow(0 0 8px currentColor); }
+    .score-ring { transition: stroke-dashoffset 1.5s cubic-bezier(0.23,1,0.32,1); }
+
+    .verdict-section { flex: 1; }
+    .verdict-label { font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 2.5px; font-weight: 600; margin-bottom: 5px; }
+    .verdict-text { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 0.5px; line-height: 1; margin-bottom: 8px; }
+    .verdict-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .chip {
+      font-family: 'DM Mono', monospace; font-size: 9px;
+      color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.07); padding: 3px 8px; border-radius: 6px;
     }
 
-    .score-circle {
-      width: 52px; height: 52px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; border: 1px solid currentColor;
-      flex-direction: column; position: relative;
-    }
-    .score-num { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 900; line-height: 1; }
-    .score-lbl { font-size: 6px; letter-spacing: 1px; opacity: .6; margin-top: 2px; }
-
-    .verdict-text { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 900; letter-spacing: 2px; }
-    .verdict-sub { font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 4px; }
-
-    .flags { margin-top: 6px; }
+    /* FLAGS */
+    .flags-title { font-size: 9px; color: rgba(255,255,255,0.22); letter-spacing: 2.5px; font-weight: 600; margin-bottom: 8px; padding-top: 2px; }
     .flag-item {
-      display: flex; align-items: flex-start; gap: 7px;
-      padding: 6px 0; border-bottom: 1px solid rgba(0,255,136,0.06);
-      font-size: 10px; animation: slideIn .3s ease;
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      animation: fadeIn 0.3s ease;
     }
     .flag-item:last-child { border-bottom: none; }
-
-    .flag-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
-    .flag-label { color: #e2e8f0; font-weight: 600; }
-    .flag-detail { color: rgba(255,255,255,0.3); font-size: 9px; }
+    .flag-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .flag-content { flex: 1; }
+    .flag-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.82); }
+    .flag-detail { font-size: 10px; color: rgba(255,255,255,0.28); margin-top: 1px; font-family: 'DM Sans'; font-weight: 300; }
     .flag-badge {
-      margin-left: auto; font-size: 8px;
-      padding: 2px 6px; letter-spacing: 1px; flex-shrink: 0;
+      font-size: 8px; padding: 2px 8px; border-radius: 6px;
+      font-weight: 700; letter-spacing: 0.8px; flex-shrink: 0;
+      font-family: 'DM Sans';
     }
 
+    /* OPEN BTN */
     .open-btn {
-      width: 100%; height: 32px;
-      background: transparent;
-      border: 1px solid rgba(0,255,136,0.15);
-      color: rgba(0,255,136,0.4);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px; letter-spacing: 2px;
-      cursor: pointer; margin-top: 10px;
-      transition: all .2s;
-      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+      width: 100%; height: 36px;
+      background: rgba(0,200,255,0.05); border: 1px solid rgba(0,200,255,0.14);
+      color: rgba(0,200,255,0.55); border-radius: 10px;
+      font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.5px; cursor: pointer; margin-top: 10px;
+      transition: all 0.25s cubic-bezier(0.23,1,0.32,1);
     }
-    .open-btn:hover { border-color: rgba(0,255,136,0.4); color: rgba(0,255,136,0.7); background: rgba(0,255,136,0.03); }
+    .open-btn:hover { background: rgba(0,200,255,0.1); border-color: rgba(0,200,255,0.28); color: #00c8ff; transform: translateY(-1px); }
+
+    /* ANIMATIONS */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,200,255,0.15); border-radius: 2px; }
   </style>
 </head>
 <body>
-  <div class="scanlines"></div>
-  <div class="grid-bg"></div>
-  <div class="corner-tl"></div><div class="corner-tr"></div>
-  <div class="corner-bl"></div><div class="corner-br"></div>
+  <div class="bg-aurora"></div>
+  <div class="bg-grid"></div>
 
   <div class="content">
+
+    <!-- HEADER -->
     <div class="header">
-      <div class="logo">PHISHGUARD</div>
+      <div class="logo">🛡️ PhishGuard</div>
       <div class="status-badge">
         <div class="status-dot"></div>
-        <span style="font-size:8px;color:rgba(0,255,136,0.5);letter-spacing:2px;">ONLINE</span>
+        <span class="status-text">ONLINE</span>
       </div>
     </div>
 
-    <div class="current-url">
-      <div class="url-label">CURRENT TARGET</div>
+    <!-- CURRENT URL -->
+    <div class="url-box">
+      <div class="url-label">CURRENT PAGE</div>
       <div class="url-text" id="currentUrl">Detecting...</div>
     </div>
 
-    <button class="scan-btn" id="scanBtn">▸ SCAN THIS PAGE</button>
+    <!-- SCAN BUTTON -->
+    <button class="scan-btn" id="scanBtn">⚡ Scan This Page</button>
 
+    <!-- LOADER -->
     <div class="loader" id="loader">
-      <div class="spinner"></div>
-      <div class="loader-text">ANALYZING THREAT VECTORS...</div>
+      <div class="spinner-wrap">
+        <div class="spinner"></div>
+        <div class="spinner-dot"></div>
+      </div>
+      <div class="loader-text">ANALYZING THREAT VECTORS</div>
     </div>
 
+    <!-- RESULT -->
     <div class="result" id="result"></div>
 
-    <button class="open-btn" id="openApp">▸ OPEN FULL PHISHGUARD APP ↗</button>
+    <!-- OPEN APP -->
+    <button class="open-btn" id="openApp">↗ Open Full PhishGuard App</button>
+
   </div>
 
   <script src="popup.js"></script>

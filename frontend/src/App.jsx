@@ -226,6 +226,48 @@ export default function App() {
     .navbar-about:hover::before{opacity:1;}
     .navbar-about:active{transform:translateY(0) scale(0.98);}
 
+    .navbar-android{
+      background:rgba(0,200,255,0.07);border:1px solid rgba(0,200,255,0.18);color:#00c8ff;padding:8px 18px;
+      font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border-radius:10px;cursor:pointer;
+      transition:all 0.3s;backdrop-filter:blur(10px);
+    }
+    .navbar-android:hover{border-color:rgba(0,200,255,0.38);color:#fff;transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,200,255,0.14);}
+
+    /* MOBILE RESPONSIVE */
+    @media(max-width:900px){
+      .navbar-link{padding:6px 8px;font-size:11px;}
+      .navbar-cta{padding:6px 10px;font-size:11px;}
+      .navbar-android{padding:6px 10px;font-size:11px;}
+      .navbar-about{padding:6px 10px;font-size:11px;}
+    }
+    @media(max-width:768px){
+      .navbar-inner{height:56px;}
+      .navbar-links{gap:2px;}
+      .navbar-link{display:none;}
+      .hero{padding:100px 1.2rem 60px;}
+      .hero-title{font-size:clamp(36px,10vw,72px);letter-spacing:-2px;}
+      .hero-sub{font-size:15px;}
+      .hero-btns{gap:8px;}
+      .btn-primary,.btn-secondary{padding:11px 20px;font-size:13px;}
+      .scanner-wrap{padding:20px;}
+      .section{padding:60px 1.2rem;}
+      .section-title{font-size:clamp(24px,5vw,36px);}
+      .footer-grid{grid-template-columns:1fr;gap:28px;}
+      .footer{padding:40px 1.2rem 28px;}
+      .step-card{padding:24px;}
+      .step-num{font-size:44px;}
+      .feature-card{padding:22px;}
+    }
+    @media(max-width:480px){
+      .navbar-android{display:none;}
+      .navbar-about{padding:6px 10px;font-size:11px;}
+      .navbar-cta{padding:6px 10px;font-size:11px;}
+      .hero-btns{flex-direction:column;align-items:center;}
+      .btn-primary,.btn-secondary{width:100%;max-width:280px;text-align:center;}
+      .scanner-wrap{padding:16px;border-radius:18px;}
+      .section{padding:48px 1rem;}
+    }
+
     /* HERO */
     .hero{padding:132px 2rem 92px;text-align:center;max-width:860px;margin:0 auto;}
     .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,200,255,0.05);
@@ -398,6 +440,7 @@ export default function App() {
               <button className="navbar-link" onClick={() => navigate("/qr")}>QR Scanner</button>
               <button className="navbar-link" onClick={() => navigate("/email")}>Email Analyzer</button>
               <MagneticBtn className="navbar-about" onClick={() => navigate("/about")}>✦ About</MagneticBtn>
+              <MagneticBtn className="navbar-android" onClick={() => navigate("/android")}>📱 Android App</MagneticBtn>
               <MagneticBtn className="navbar-cta" onClick={() => navigate("/install")}>
                 Chrome Extension ↗
               </MagneticBtn>
@@ -640,6 +683,7 @@ export default function App() {
                 <button className="footer-link" onClick={() => navigate("/bulk")}>Bulk Scanner</button>
                 <button className="footer-link" onClick={() => navigate("/qr")}>QR Scanner</button>
                 <button className="footer-link" onClick={() => navigate("/email")}>Email Analyzer</button>
+                <button className="footer-link" onClick={() => navigate("/android")}>📱 Android App</button>
               </div>
               <div>
                 <p className="footer-heading">PROJECT</p>

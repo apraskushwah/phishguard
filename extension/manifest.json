@@ -9,7 +9,7 @@
     "storage"
   ],
   "host_permissions": [
-    "http://https://phishguard-backend-6cq9.onrender.com/*"
+    "https://phishguard-backend-6cq9.onrender.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

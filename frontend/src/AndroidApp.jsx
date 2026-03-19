@@ -310,7 +310,7 @@ export default function AndroidApp() {
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
             {[
               { icon: "🤖", label: "Android 7.0+" },
-              { icon: "📦", label: "~40 MB" },
+              { icon: "📦", label: "~100 MB" },
               { icon: "🆓", label: "100% Free" },
               { icon: "🔒", label: "No Login Required" },
             ].map((chip, i) => (
@@ -378,7 +378,7 @@ export default function AndroidApp() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 18, maxWidth: 860, margin: "0 auto" }}>
             {[
               { icon: "🤖", title: "Android Version", value: "Android 7.0 (Nougat) or higher", color: "#00c8ff" },
-              { icon: "💾", title: "Storage Required", value: "Approximately 40 MB free space", color: "#00ffb4" },
+              { icon: "💾", title: "Storage Required", value: "Approximately 100 MB free space", color: "#00ffb4" },
               { icon: "🌐", title: "Internet Connection", value: "Required for real-time URL scanning", color: "#ffb400" },
               { icon: "📷", title: "Camera Access", value: "Optional — needed for QR Scanner only", color: "#ff3c64" },
             ].map((r, i) => (
